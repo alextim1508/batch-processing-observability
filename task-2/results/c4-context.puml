@@ -1,0 +1,27 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title C4 Context: Price Export (K8s CronJob)
+
+Person(b2b, "B2B Клиент", "Скачивает прайс‑листы через портал/ссылку")
+
+System_Boundary(shop, "Сайт интернет‑магазина") {
+  System(shopPortal, "Shop Site", "ReactJS")
+}
+
+System(priceExporter, "B2B Price Exporter", "Go Service")
+SystemDb(db, "PostgreSQL", "products, categories, clients, client_prices")
+System_Ext(s3, "Object Storage (S3 совместимое хранилище)", "Хранение файлов: prices/YYYY‑MM‑DD/*")
+System_Ext(obs, "Observability Stack", "Prometheus/Grafana, Filebeat")
+System_Ext(properties, "ConfigMap", "Настройки подключения")
+System_Ext(sec, "Secrets Manager", "K8s Secrets")
+
+Rel(b2b, shopPortal, "Скачивание прайс-листов")
+Rel(shopPortal, s3, "Запрашивает временную ссылку на файл", "HTTPS")
+Rel(priceExporter, db, "SELECT (JOIN по products/categories/client_prices)", "JDBC/SSL")
+Rel(priceExporter, s3, "Загрузка CSV/XLSX и index.json", "S3 API (HTTPS)")
+Rel(priceExporter, obs, "Метрики/Логи/Трейсы", "stdout/structured logging")
+Rel(priceExporter, properties, "Читает строку соединения к Postgres и настройки S3")
+Rel(priceExporter, sec, "Читает логин/пароль подключения к Postgres и clientSecret S3")
+
+@enduml

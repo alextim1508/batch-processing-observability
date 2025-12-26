@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: price-exporter
+  labels:
+    app: price-exporter
+spec:
+  schedule: "0 6 * * *"
+  timeZone: "Europe/Moscow"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 600
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          serviceAccountName: price-exporter
+          restartPolicy: Never
+          containers:
+            - name: exporter
+              image: registry.example.com/b2b/price-exporter:1.0.0
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: price-exporter-config
+                - secretRef:
+                    name: price-exporter-secrets
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "256Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
+              args:
+                - "--date=${EXPORT_DATE:-$(date +%F)}"
+                - "--output-prefix=prices/${EXPORT_DATE:-$(date +%F)}/"
+          tolerations: []
+          nodeSelector: {}
