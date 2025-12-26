@@ -1,0 +1,11 @@
+delivery_id,delivery_status,order_id,client_id
+1,delivered,101,1
+2,failed,102,2
+3,delivered,103,1
+4,delivered,104,3
+5,failed,105,2
+6,delivered,106,4
+7,failed,107,5
+8,delivered,108,1
+9,delivered,109,3
+10,failed,110,2
