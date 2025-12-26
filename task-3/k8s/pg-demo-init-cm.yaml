@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-demo-init
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS shipments (
+                                             id BIGSERIAL PRIMARY KEY,
+                                             client_id BIGINT,
+                                             origin TEXT,
+                                             destination TEXT,
+                                             created_at TIMESTAMPTZ DEFAULT now()
+    );
+    INSERT INTO shipments (client_id, origin, destination)
+    VALUES
+      (1, 'Moscow', 'Volgograd'),
+      (2, 'Samara', 'Sochi'),
+      (3, 'Kazan', 'Ufa'),
+      (4, 'Novosibirsk', 'Omsk'),
+      (5, 'Yekaterinburg', 'Chelyabinsk'),
+      (6, 'Nizhny Novgorod', 'Kazan'),
+      (7, 'Rostov-on-Don', 'Saratov'),
+      (8, 'Voronezh', 'Kursk'),
+      (9, 'Perm', 'Izhevsk'),
+      (10, 'Krasnodar', 'Rostov-on-Don'),
+      (11, 'Vladivostok', 'Khabarovsk'),
+      (12, 'Irkutsk', 'Ulan-Ude')
+    ON CONFLICT DO NOTHING;

@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-csv-exporter
+  labels:
+    app: pg-csv-exporter
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: exporter
+              image: pg-csv-exporter:0.1
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - secretRef:
+                    name: pg-exporter-secret
+                - configMapRef:
+                    name: pg-exporter-config
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+          volumes:
+            - name: data
+              emptyDir: { }

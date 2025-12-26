@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-exporter-config
+data:
+  TABLE: "shipments"
+  OUTPUT_DIR: "/data"
