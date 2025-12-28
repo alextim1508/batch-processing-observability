@@ -1,4 +1,4 @@
-FROM openjdk:24-slim
+FROM eclipse-temurin:17-jdk
 # 8080
 WORKDIR .
 COPY build/libs/*.jar app.jar

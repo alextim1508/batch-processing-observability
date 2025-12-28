@@ -1,0 +1,23 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Сотрудник склада", " Пользователь выбирает CSV-файл, запускает загрузку и видит статус, результат или ошибки.")
+
+System_Boundary(sys, "ETL System") {
+  Container(web, "Web UI", "Browser", "Интерфейс загрузки и отслеживания")
+  Container(mon, "ERP Core", "Java 11 / WildFly", "Приём CSV, валидация, запись в GCS, уведомления")
+  Container(etl, "Batch Processor", "Spring Boot 3 + Spring Batch", "Чтение из GCS, обработка, загрузка в БД")
+  ContainerDb(pg, "PostgreSQL", "SQL", "Данные, staging, JobRepository")
+  Container_Ext(gcs, "Google Cloud Storage", "Object Storage", "Хранилище файлов")
+  Container_Ext(prom, "Monitoring", "Metrics", "Сбор метрик и мониторинг")
+}
+
+Rel(user, web, "Загрузка / статус")
+Rel(web, mon, "POST /upload (CSV)")
+Rel(mon, gcs, "PUT object (CSV)")
+Rel(mon, etl, "Запуск Job (REST)")
+Rel(etl, gcs, "GET object (CSV)")
+Rel(etl, pg, "JDBC", "Запросы")
+Rel(etl, mon, "Статус (Webhook)")
+Rel(etl, prom, "/actuator/prometheus")
+@enduml
