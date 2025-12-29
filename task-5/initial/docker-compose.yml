@@ -103,3 +103,16 @@ services:
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "3000" ]
 
+  zipkin:
+    image: openzipkin/zipkin:2.24
+    container_name: zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    environment:
+      - STORAGE_TYPE=mem
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9411/health" ]
+      interval: 10s
+      timeout: 2s
+      retries: 12
