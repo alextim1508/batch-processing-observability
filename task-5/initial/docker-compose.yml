@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  app:
+    depends_on:
+      - postgresdb
+      - filebeat
+      - grafana
+    image: batch-processing
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: no
+    ports:
+      - '8080:8080'
+
   postgresdb:
     image: postgres
     restart: unless-stopped
@@ -90,13 +103,3 @@ services:
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "3000" ]
 
-  app:
-    depends_on:
-      - postgresdb
-      - filebeat1
-      - grafana
-    image: batch-processing
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    restart: no
